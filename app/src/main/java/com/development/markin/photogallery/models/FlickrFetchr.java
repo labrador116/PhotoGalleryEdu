@@ -3,6 +3,10 @@ package com.development.markin.photogallery.models;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +14,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,7 +44,7 @@ public class FlickrFetchr {
             int bytesRead =0;
             byte [] buffer = new byte[1024];
 
-            //Почитать
+
             while ((bytesRead = in.read(buffer)) > 0){
                 out.write(buffer,0,bytesRead);
             }
@@ -55,7 +60,7 @@ public class FlickrFetchr {
         return new String(getUrlBytes(urlString));
     }
 
-    public List<GalleryItem> fetchItems(){
+    public List<GalleryItem> fetchItems(int pageNumber){
         List<GalleryItem> items = new ArrayList<>();
              try {
                  String url = Uri.parse("https://api.flickr.com/services/rest/").buildUpon()
@@ -64,11 +69,11 @@ public class FlickrFetchr {
                          .appendQueryParameter("format", "json")
                          .appendQueryParameter("nojsoncallback", "1")
                          .appendQueryParameter("extras", "url_s")
+                         .appendQueryParameter("page", String.valueOf(pageNumber))
                          .build().toString();
 
                  String jsonString = getUrlString(url);
                  Log.i(TAG, "Receive JSON:" + jsonString);
-
                  JSONObject object = new JSONObject(jsonString);
                  parseItems(items,object);
              } catch (IOException e) {
