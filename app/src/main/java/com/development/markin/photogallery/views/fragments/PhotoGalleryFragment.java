@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.development.markin.photogallery.R;
@@ -44,10 +45,20 @@ public class PhotoGalleryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.photo_gallery_fragment, container, false);
+        final View view = inflater.inflate(R.layout.photo_gallery_fragment, container, false);
 
         mPhotoRecyclerView = (RecyclerView) view.findViewById(R.id.photo_gallery_fragment_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        mPhotoRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int widthColumn = 270;
+                mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),
+                        mPhotoRecyclerView.getWidth() / widthColumn
+                ));
+
+                mPhotoRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
         mPhotoRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
