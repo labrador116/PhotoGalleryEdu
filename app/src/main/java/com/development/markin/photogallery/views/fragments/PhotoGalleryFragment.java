@@ -1,5 +1,7 @@
 package com.development.markin.photogallery.views.fragments;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -12,6 +14,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +42,7 @@ public class PhotoGalleryFragment extends Fragment {
     private List<GalleryItem> mItems = new ArrayList<>();
     private int mCountPage =1;
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
+    private LruCache<String,Bitmap> mCache;
 
     public static PhotoGalleryFragment newInstance(){
         return new PhotoGalleryFragment();
@@ -48,6 +52,12 @@ public class PhotoGalleryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        ActivityManager am = (ActivityManager) getContext().getSystemService(
+                Context.ACTIVITY_SERVICE);
+        int maxKb = am.getMemoryClass() * 1024;
+        int limitKb = maxKb / 8;
+
+        mCache = new LruCache<>(limitKb);
         new FetchItemTask().execute(mCountPage);
 
         Handler responseHandler = new Handler();
@@ -180,7 +190,13 @@ public class PhotoGalleryFragment extends Fragment {
             GalleryItem galleryItem = mGalleryItems.get(position);
             Drawable placeHolder = getResources().getDrawable(R.drawable.brian_up_close);
             holder.bindDrawable(placeHolder);
-            mThumbnailDownloader.quequeThumbnail(holder,galleryItem.getUrl());
+
+            Bitmap bitmap = mCache.get(galleryItem.getUrl());
+            if (bitmap!=null){
+                Drawable drawable = new BitmapDrawable(getResources(),bitmap);
+                holder.bindDrawable(drawable);
+            }
+            mThumbnailDownloader.quequeThumbnail(holder,galleryItem.getUrl(), mCache);
         }
 
         @Override
