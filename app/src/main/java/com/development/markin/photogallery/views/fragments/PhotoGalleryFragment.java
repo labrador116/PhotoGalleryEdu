@@ -139,7 +139,12 @@ public class PhotoGalleryFragment extends Fragment {
 
         @Override
         protected List<GalleryItem> doInBackground(Integer... params) {
-           return new FlickrFetchr().fetchItems(params[0]);
+           String query = "robot";
+            if(query==null){
+                return new FlickrFetchr().fetchRecentPhotos();
+            } else {
+                return new FlickrFetchr().searchPhotos(query);
+            }
         }
 
         @Override
