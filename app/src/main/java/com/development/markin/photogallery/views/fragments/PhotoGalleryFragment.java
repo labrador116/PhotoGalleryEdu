@@ -2,6 +2,7 @@ package com.development.markin.photogallery.views.fragments;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 import com.development.markin.photogallery.R;
 import com.development.markin.photogallery.models.FlickrFetchr;
 import com.development.markin.photogallery.models.GalleryItem;
+import com.development.markin.photogallery.models.PollService;
 import com.development.markin.photogallery.models.QueryPreferences;
 import com.development.markin.photogallery.models.assync.ThumbnailDownloader;
 
@@ -69,6 +71,8 @@ public class PhotoGalleryFragment extends Fragment {
 
         mCache = new LruCache<>(limitKb);
         updateItems();
+
+       PollService.setServiceAlarm(getContext(),true);
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
