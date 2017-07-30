@@ -41,6 +41,8 @@ import com.development.markin.photogallery.models.PollJobService;
 import com.development.markin.photogallery.models.PollService;
 import com.development.markin.photogallery.models.QueryPreferences;
 import com.development.markin.photogallery.models.assync.ThumbnailDownloader;
+import com.development.markin.photogallery.views.activities.PhotoGalleryActivity;
+import com.development.markin.photogallery.views.activities.PhotoPageActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ import java.util.List;
  * Created by sbt-markin-aa on 11.05.17.
  */
 
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
     private static final String TAG ="PhotoGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
@@ -264,18 +266,29 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
-    private class PhotoHolder extends RecyclerView.ViewHolder{
+    private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView mItemImageView;
+        private GalleryItem mGalleryItem;
 
         public PhotoHolder(View itemView) {
             super(itemView);
             mItemImageView = (ImageView) itemView.findViewById(R.id.fragment_photo_gallery_image_view);
+            itemView.setOnClickListener(this);
         }
 
         public void bindDrawable(Drawable drawable){
             mItemImageView.setImageDrawable(drawable);
         }
 
+        public void bindGalleryItem (GalleryItem item){
+            mGalleryItem = item;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent i = PhotoPageActivity.newIntent(getContext(),mGalleryItem.getPhotoFileUri());
+            startActivity(i);
+        }
     }
 
     private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>{
@@ -299,6 +312,7 @@ public class PhotoGalleryFragment extends Fragment {
             GalleryItem galleryItem = mGalleryItems.get(position);
             Drawable placeHolder = getResources().getDrawable(R.drawable.brian_up_close);
             holder.bindDrawable(placeHolder);
+            holder.bindGalleryItem(galleryItem);
 
             Bitmap bitmap = mCache.get(galleryItem.getUrl());
             if (bitmap!=null){

@@ -2,9 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.development.markin.photogallery">
 
+    <permission android:name="com.development.markin.photogallery.PRIVATE"
+                android:protectionLevel="signature"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.development.markin.photogallery.PRIVATE"/>
 
     <application
         android:allowBackup="true"
@@ -20,6 +24,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".views.activities.PhotoPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
         <service android:name=".models.PollService"/>
         <service android:name=".models.PollJobService"
                  android:permission="android.permission.BIND_JOB_SERVICE"
@@ -28,6 +37,12 @@
         <receiver android:name=".models.StartupReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".models.NotoficationReceiver" android:exported="false">
+            <intent-filter android:priority="-999">
+                <action android:name="com.development.markin.photogallery.SHOW_NOTIFICATION"/>
             </intent-filter>
         </receiver>
 
